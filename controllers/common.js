@@ -3,16 +3,23 @@ const domain = require('../db/models');
 /* eslint-disable no-undef */
 exports.getBookingHistory = async (req, res, next) => {
   try {
-    const bookings = await domain.Booking.find({
-      user: req.loggedInUser._id,
+    const bookings = await domain.Booking.find(
+      {
+        user: req.loggedInUser._id,
+      },
+      '-__v -updatedAt ',
+      {
+        limit: parseInt(req.query.limit),
+        skip: parseInt(req.query.skip),
+      }
+    ).populate({
+      path: 'cab',
+      select: {
+        _id: 1,
+        baseCharges: 1,
+        model: 1,
+      },
     });
-
-    // await domain.Project.create({
-    //   id: configHolder.generateUniqueId(),
-    //   projectName,
-    //   view,
-    //   createdBy: req.loggedInUser.id,
-    // });
 
     const response = views.JsonView({ bookings });
     return res.status(201).json(response);
@@ -29,7 +36,7 @@ exports.bookNearByCab = async (req, res, next) => {
       {
         isBooked: false,
       },
-      'location _id'
+      'location _id baseCharges'
     );
 
     if (!cabs || !cabs.length) {
@@ -39,16 +46,28 @@ exports.bookNearByCab = async (req, res, next) => {
     }
 
     const cabDistance = [];
-    for (const cab of cabs) {
-      cabDistance.push(
-        getDistanceFromLatLonInKm(
-          cab.location.lati,
-          cab.location.longi,
-          req.loggedInUser.lati,
-          req.loggedInUser.longi
-        )
-      );
-    }
+    const distantCab = cabs.map((a) => ({
+      _id: a._id,
+      baseCharges: a.baseCharges,
+      distanceFromPassenger: getDistanceFromLatLonInKm(
+        a.location.lati,
+        a.location.longi,
+        req.loggedInUser.location.lati,
+        req.loggedInUser.location.longi
+      ),
+    }));
+
+    const nearestCab = distantCab.sort((a, b) =>
+      a.distanceFromPassenger > b.distanceFromPassenger ? 1 : 0
+    )[0];
+
+    await new domain.Booking({
+      destination,
+      noOfPassenger,
+      totalAmount: nearestCab.baseCharges * noOfPassenger,
+      user: req.loggedInUser._id,
+      cab: nearestCab._id,
+    }).save();
 
     const response = views.JsonView({ distance: cabDistance });
     return res.status(201).json(response);
@@ -59,38 +78,32 @@ exports.bookNearByCab = async (req, res, next) => {
 
 /**
  *
- * @param {number} latitude1
- * @param {number} longitude1
- * @param {number} latitude2
- * @param {number} longitude2
- * @param {number} units
+ * @param {number} lat1
+ * @param {number} lon1
+ * @param {number} lat2
+ * @param {number} lon2
  * @returns returns the distance between two
  */
-function getDistanceFromLatLonInKm(
-  latitude1,
-  longitude1,
-  latitude2,
-  longitude2
-) {
-  const earthRadius = 6371; // Radius of the earth in km
-  const dLat = deg2rad(latitude2 - latitude1); // deg2rad below
-  const dLon = deg2rad(longitude2 - longitude1);
-  const a =
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2 - lat1); // deg2rad below
+  var dLon = deg2rad(lon2 - lon1);
+  var a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(deg2rad(latitude1)) *
-      Math.cos(deg2rad(latitude2)) *
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return earthRadius * c;
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  var d = R * c; // Distance in km
+  return d;
 }
 
 /**
  *
- * @param {Number} degrees latitude or longitude degree
+ * @param {Number} deg latitude or longitude degree
  * @returns Retuns the radians from the degree
  */
-function deg2rad(degrees) {
-  var pi = Math.PI;
-  return degrees * (pi / 180);
+function deg2rad(deg) {
+  return deg * (Math.PI / 180);
 }

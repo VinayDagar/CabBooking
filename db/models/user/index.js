@@ -10,6 +10,6 @@ const UserModel = new MongooseSchema(fields, {
 UserModel.pre('save', beforeSave);
 
 // Defining class methods for user model.
-Object.assign(UserModel.methods, requireDirectory(module, 'class-methods'));
+Object.assign(UserModel.statics, requireDirectory(module, 'class-methods'));
 
 module.exports = MongooseConnect.model('User', UserModel);

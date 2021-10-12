@@ -31,11 +31,11 @@ router
     canAccess(['anonymous']),
     loginController
   )
-  .post('book-cab', authenticated, canAccess(['user']), bookNearByCab)
+  .post('/book-cab', authenticated, canAccess(['customer']), bookNearByCab)
   .get(
-    'booking-history',
+    '/booking-history',
     authenticated,
-    canAccess(['user']),
+    canAccess(['customer']),
     getBookingHistory
   );
 

@@ -32,6 +32,7 @@ module.exports = {
   },
   isAccountLocked: {
     type: Boolean,
+    default: false,
   },
   isEmailVerified: {
     type: Boolean,
@@ -40,5 +41,9 @@ module.exports = {
   isPhoneVerified: {
     type: Boolean,
     default: false,
+  },
+  location: {
+    lati: String,
+    longi: String,
   },
 };

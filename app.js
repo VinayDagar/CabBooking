@@ -17,7 +17,7 @@ app.use('/api/v1/common', commonRoutes);
 
 app.get('/', (req, res) => res.status(200).send('Server is running'));
 
-app.use((error, req, res) => {
+app.use((error, req, res, next) => {
   Logger.error('Error ', { error });
 
   if (error instanceof ValidationError) {
