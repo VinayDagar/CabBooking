@@ -11,6 +11,10 @@ global.configHolder = require('./configurations/dependency-include');
 
 require('./configurations/init')();
 
+const commonRoutes = require('./configurations/routes/common');
+
+app.use('/api/v1/common', commonRoutes);
+
 app.get('/', (req, res) => res.status(200).send('Server is running'));
 
 app.use((error, req, res) => {

@@ -17,7 +17,7 @@ module.exports = async (req, res, next) => {
       return next(err);
     }
 
-    const { userId, type } = configHolder.jwtUtility.verifyToken(
+    const { userId } = configHolder.jwtUtility.verifyToken(
       token,
       process.env.APP_SECRET_KEY
     );
@@ -29,9 +29,7 @@ module.exports = async (req, res, next) => {
     }
 
     const user = await domain.User.findOne({
-      where: {
-        id: userId,
-      },
+      _id: userId,
     });
 
     if (!user) {
@@ -48,25 +46,6 @@ module.exports = async (req, res, next) => {
       return next(error);
     }
     req.loggedInUser = user;
-
-    if (user.role === 'client_user') {
-      const clientUser = await domain.ClientProfile.findOne({
-        where: {
-          userId: user.id,
-        },
-        include: [
-          {
-            model: domain.Client,
-            attribute: ['id', 'userId'],
-          },
-        ],
-      });
-      req.loggedInUser.clientId = clientUser.Client.id;
-      req.loggedInUser.dataValues.clientId = clientUser.Client.id;
-
-      req.loggedInUser.clientUserId = clientUser.Client.userId;
-      req.loggedInUser.dataValues.clientUserId = clientUser.Client.userId;
-    }
 
     next();
   } catch (err) {
