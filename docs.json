@@ -1,0 +1,331 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "This is a sample server for Booking Cab online. You can find out more about     Application at [here](https://docs.google.com/document/d/13q0tusRqWdaMA_RdCqIwFambLONYfvIc-8Lv_9a-TcQ/edit#heading=h.dqe4ujpguda6).",
+    "version": "1.0.0",
+    "title": "Cab Booking By SoluLab",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "email": "vinay.dagar102@gmail.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "host": "localhost:4000",
+  "basePath": "/api/v1",
+  "tags": [
+    {
+      "name": "Cab",
+      "description": ""
+    }
+  ],
+  "schemes": [
+    "https",
+    "http"
+  ],
+  "paths": {
+    "/common/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Login the user.",
+        "description": "Will login the user and return the token",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Authentication Details",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Login"
+            }
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns details of currently booked cab",
+            "schema": {
+              "$ref": "#/definitions/LoginResponse"
+            }
+          },
+          "404": {
+            "description": "Returns 404 if the no cab is available"
+          }
+        }
+      }
+    },
+    "/common/book-cab": {
+      "post": {
+        "tags": [
+          "BookCab"
+        ],
+        "summary": "Book the cab to destination location.",
+        "description": "Will Book the cab which is nearest and is currently available",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Destination and No of Passengers",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CabBooking"
+            }
+          },
+          {
+            "name": "x-access-tokne",
+            "type": "string",
+            "in": "header",
+            "description": "JWT Auth token",
+            "required": true
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns details of currently booked cab",
+            "schema": {
+              "$ref": "#/definitions/BookedCab"
+            }
+          },
+          "404": {
+            "description": "Returns 404 if the no cab is available"
+          }
+        }
+      }
+    },
+    "/common/booking-history": {
+      "get": {
+        "tags": [
+          "BookCab"
+        ],
+        "summary": "Get list of past bookings",
+        "description": "It will return the list of past bookings of the user.",
+        "operationId": "getPublisher",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "type": "string",
+            "in": "query",
+            "description": "Limit the number of items",
+            "required": true
+          },
+          {
+            "name": "skip",
+            "type": "string",
+            "in": "query",
+            "description": "No of items to skip",
+            "required": true
+          },
+          {
+            "name": "x-access-tokne",
+            "type": "string",
+            "in": "header",
+            "description": "JWT Auth token",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of previous bookings",
+            "schema": {
+              "$ref": "#/definitions/BookingHistory"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "CabBooking": {
+      "type": "object",
+      "properties": {
+        "destination": {
+          "type": "object",
+          "properties": {
+            "longi": {
+              "type": "string"
+            },
+            "lati": {
+              "type": "string"
+            }
+          }
+        },
+        "noOfPassengers": {
+          "type": "number"
+        }
+      }
+    },
+    "BookedCab": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "totalAmount": {
+              "type": "number"
+            },
+            "totalNumberOfPassengers": {
+              "type": "number"
+            },
+            "totalDistanceOfCabToPassenger": {
+              "type": "string"
+            },
+            "pickupLocation": {
+              "type": "object",
+              "properties": {
+                "longi": {
+                  "type": "string"
+                },
+                "lati": {
+                  "type": "string"
+                }
+              }
+            },
+            "dropLocation": {
+              "type": "object",
+              "properties": {
+                "longi": {
+                  "type": "string"
+                },
+                "lati": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "BookingHistory": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string"
+        },
+        "destination": {
+          "type": "object",
+          "properties": {
+            "longi": {
+              "type": "string"
+            },
+            "lati": {
+              "type": "string"
+            }
+          }
+        },
+        "cab": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "baseCharges": {
+              "type": "number"
+            }
+          }
+        },
+        "totalAmount": {
+          "type": "number"
+        },
+        "isPaid": {
+          "type": "boolean"
+        },
+        "noOfPassenger": {
+          "type": "number"
+        },
+        "createdAt": {
+          "type": "string"
+        }
+      }
+    },
+    "LoginResponse": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "user": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "phone": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "role": {
+              "type": "string"
+            },
+            "location": {
+              "type": "object",
+              "properties": {
+                "longi": {
+                  "type": "string"
+                },
+                "lati": {
+                  "type": "string"
+                }
+              }
+            },
+            "isAccountLocked": {
+              "type": "boolean"
+            },
+            "isEmailVerified": {
+              "type": "boolean"
+            },
+            "isPhoneVerified": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "Login": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  }
+}

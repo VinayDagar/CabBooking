@@ -22,7 +22,7 @@ exports.getBookingHistory = async (req, res, next) => {
     });
 
     const response = views.JsonView({ bookings });
-    return res.status(201).json(response);
+    return res.status(200).json(response);
   } catch (err) {
     next(err);
   }
@@ -45,7 +45,6 @@ exports.bookNearByCab = async (req, res, next) => {
       return next(error);
     }
 
-    const cabDistance = [];
     const distantCab = cabs.map((a) => ({
       _id: a._id,
       baseCharges: a.baseCharges,
@@ -69,7 +68,20 @@ exports.bookNearByCab = async (req, res, next) => {
       cab: nearestCab._id,
     }).save();
 
-    const response = views.JsonView({ distance: cabDistance });
+    const response = views.JsonView({
+      message: 'Cab booked and will arrive soo',
+      data: {
+        totalAmount: nearestCab.baseCharges * noOfPassenger,
+        totalNumberOfPassengers: noOfPassenger,
+        totalDistanceOfCabToPassenger: nearestCab.distanceFromPassenger,
+        pickupLocation: {
+          lati: req.loggedInUser.location.lati,
+          longi: req.loggedInUser.location.longi,
+        },
+        dropLocation: destination,
+      },
+    });
+
     return res.status(201).json(response);
   } catch (err) {
     next(err);

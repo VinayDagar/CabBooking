@@ -5,6 +5,9 @@ const helmet = require('helmet');
 const hpp = require('hpp');
 const path = require('path');
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
+
+const swaggerDocument = require('../docs.json');
 
 App.use(express.json());
 App.use(express.static(path.join(__dirname, '..', 'public')));
@@ -17,6 +20,8 @@ App.use((req, res, next) => {
   Logger.info(`Route: ${req.url}`);
   next();
 });
+
+App.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 /**
  * @description Check if admin exist or not, if not create the Admin user.
