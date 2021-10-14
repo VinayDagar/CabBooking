@@ -42,91 +42,101 @@ describe('Controller: Authentication', function () {
       };
 
       await authenticationController.registerController(req, res, next);
-      console.log(res.status, res.statusCode);
 
       sinon.assert.calledWith(res.statusCode, 400);
     });
-    // it('should return 201 status if user successfully created', async function (done) {
-    //   const req = mockRequest({
-    //     body: {
-    //       phone: '',
-    //       email: '',
-    //       password: '',
-    //       name: '',
-    //     },
-    //     params: {
-    //       role: '',
-    //     },
-    //   });
+    it('should return 201 status if user successfully created', async function (done) {
+      const req = mockRequest({
+        body: {
+          phone: '',
+          email: '',
+          password: '',
+          name: '',
+        },
+        params: {
+          role: '',
+        },
+      });
 
-    //   const res = mockResponse();
+      const res = mockResponse();
 
-    //   const next = function () {
-    //     done();
-    //   };
+      global.domain = {
+        User: {
+          findByEmail: sinon.stub().resolves({}),
+        },
+      };
 
-    //   await authenticationController.registerController(req, res, next);
-    //   sinon.assert.calledWith(req.status, 201);
-    // });
+      const next = function () {
+        done();
+      };
+
+      await authenticationController.registerController(req, res, next);
+      sinon.assert.calledWith(req.status, 201);
+    });
   });
-  //   describe('Login Controller', function () {
-  //     it('Exist', function () {
-  //       assert.ok(!!authenticationController.registerController);
-  //     });
-  //     it('should return 400 if email or password not provided', async function (done) {
-  //       const req = mockRequest({
-  //         body: {
-  //           password: '',
-  //         },
-  //       });
+  describe('Login Controller', function () {
+    it('Exist', function () {
+      assert.ok(!!authenticationController.registerController);
+    });
+    it('should return 400 if email or password not provided', async function (done) {
+      const req = mockRequest({
+        body: {
+          password: '',
+        },
+      });
 
-  //       const res = mockResponse();
+      const res = mockResponse();
 
-  //       const next = function () {
-  //         done();
-  //       };
+      const next = function () {
+        done();
+      };
+      global.domain = {
+        User: {
+          findByEmail: sinon.stub().resolves({}),
+        },
+      };
 
-  //       await authenticationController.loginController(req, res, next);
+      await authenticationController.loginController(req, res, next);
 
-  //       sinon.assert.calledWith(req.status, 400);
-  //     });
-  //     it('should return 400 status if user not found', async function (done) {
-  //       const req = mockRequest({
-  //         body: {
-  //           phone: '',
-  //           email: '',
-  //           password: '',
-  //           name: '',
-  //         },
-  //         params: {
-  //           role: '',
-  //         },
-  //       });
+      sinon.assert.calledWith(req.status, 400);
+    });
+    it('should return 400 status if user not found', async function (done) {
+      const req = mockRequest({
+        body: {
+          phone: '',
+          email: '',
+          password: '',
+          name: '',
+        },
+        params: {
+          role: '',
+        },
+      });
 
-  //       const res = mockResponse();
+      const res = mockResponse();
 
-  //       const next = function () {
-  //         done();
-  //       };
+      const next = function () {
+        done();
+      };
 
-  //       await authenticationController.registerController(req, res, next);
-  //       sinon.assert.calledWith(req.status, 201);
-  //     });
-  //   });
-  //   it('should return 200 status', function () {
-  //     const res = mockResponse();
+      await authenticationController.registerController(req, res, next);
+      sinon.assert.calledWith(req.status, 201);
+    });
+  });
+  it('should return 200 status', function () {
+    const res = mockResponse();
 
-  //     authenticationController.healthcheck(mockRequest(), res);
+    authenticationController.healthcheck(mockRequest(), res);
 
-  //     sinon.assert.calledWith(res.status, 200);
-  //   });
-  //   it('returns current version of the app', function () {
-  //     const res = mockResponse();
+    sinon.assert.calledWith(res.status, 200);
+  });
+  it('returns current version of the app', function () {
+    const res = mockResponse();
 
-  //     authenticationController.healthcheck(mockRequest(), res);
+    authenticationController.healthcheck(mockRequest(), res);
 
-  //     sinon.assert.calledWith(res.json, {
-  //       version: version,
-  //     });
-  //   });
+    sinon.assert.calledWith(res.json, {
+      version: version,
+    });
+  });
 });

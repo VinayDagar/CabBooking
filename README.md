@@ -55,6 +55,12 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
         OR
     $ npm install
 
+---
+## After Installation Migrate Data to create dummy users and cabs
+    $ npm run migrate
+## For Test coverage
+    $ npm test
+
 == Supported versions
 
 * **git >= 2.23.0**
