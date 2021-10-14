@@ -2,3 +2,5 @@
 /npm-debug.log
 /logs
 .idea
+.nyc_output/
+coverage/

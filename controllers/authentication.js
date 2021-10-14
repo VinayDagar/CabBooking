@@ -34,7 +34,7 @@ exports.loginController = async (req, res, next) => {
 
     if (!email || !password) {
       const error = new Error('Invaid arguments!');
-      error.statusCode = 401;
+      error.statusCode = 400;
       return next(error);
     }
 
@@ -91,7 +91,7 @@ const createTokenAndReturn = async (user, res, callback) => {
       userId: user._id,
       type: 'AUTH_TOKEN',
       meta: {
-        APP_NAME: 'TASK_LOGGER',
+        APP_NAME: 'CAB_BOOKING',
       },
     };
     const token = configHolder.jwtUtility.createToken(payload);

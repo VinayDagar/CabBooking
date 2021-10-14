@@ -1,0 +1,20 @@
+{
+    "all": true,
+    "check-coverage": true,
+    "exclude": [
+      "migrations",
+      "test",
+      "configurations",
+      "coverage",
+      "process.config.js",
+      "env",
+      "app.js",
+      "utilities",
+      "db",
+      "application"
+    ],
+    "statements": 80,
+    "branches": 60,
+    "functions": 80,
+    "lines": 80
+  }
